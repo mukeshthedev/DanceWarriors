@@ -1,37 +1,57 @@
-    // Elements
-    const htmlEl = document.documentElement;
-    const hero = document.getElementById("home");
-    const fab = document.getElementById("themeFab");
-    const fabIconWrap = document.getElementById("themeFabIcon");
+const htmlEl = document.documentElement;
+const hero = document.getElementById("home");
+const fab = document.getElementById("themeFab");
 
-    // Put the hero image according to theme
-    function setHeroBackgroundForTheme(mode) {
-      hero.style.backgroundImage = mode === "dark"
-        ? "url('assets/black.png')"
-        : "url('assets/white.png')";
-      hero.classList.toggle("text-light", mode === "dark");
-      hero.classList.toggle("text-dark", mode === "light");
-    }
+/* Get the <i> icon INSIDE the button */
+const fabIcon = fab.querySelector("i");
 
-    // Apply theme + swap icon
-    function setTheme(mode) {
-      htmlEl.setAttribute("data-bs-theme", mode);
-      setHeroBackgroundForTheme(mode);
-      fabIconWrap.innerHTML =
-        mode === "light"
-          ? '<i class="fa-solid fa-moon"></i>'
-          : '<i class="bi bi-sun-fill"></i>';
-      localStorage.setItem("dw-bs-theme", mode);
-    }
+/* ===============================
+   Hero Background
+=============================== */
+function setHeroBackgroundForTheme(mode) {
+  hero.style.backgroundImage =
+    mode === "dark"
+      ? "url('assets/black.png')"
+      : "url('assets/white.png')";
 
-    // Init theme
-    setTheme(localStorage.getItem("dw-bs-theme") || "dark");
+  hero.classList.toggle("text-light", mode === "dark");
+  hero.classList.toggle("text-dark", mode === "light");
+}
 
-    // Toggle handler
-    fab.addEventListener("click", () => {
-      const next = htmlEl.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
-      setTheme(next);
-    });
+/* ===============================
+   Theme Switcher
+=============================== */
+function setTheme(mode) {
+  htmlEl.setAttribute("data-bs-theme", mode);
+  setHeroBackgroundForTheme(mode);
+
+  /* Change icon */
+  fabIcon.className =
+    mode === "light"
+      ? "fa-solid fa-moon"
+      : "bi bi-sun-fill";
+
+  localStorage.setItem("dw-bs-theme", mode);
+}
+
+/* ===============================
+   Init theme
+=============================== */
+const savedTheme = localStorage.getItem("dw-bs-theme") || "dark";
+setTheme(savedTheme);
+
+/* ===============================
+   Toggle theme
+=============================== */
+fab.addEventListener("click", () => {
+  const current = htmlEl.getAttribute("data-bs-theme");
+  const next = current === "dark" ? "light" : "dark";
+  setTheme(next);
+});
+
+
+
+
 
   const form = document.getElementById("contactForm");
   const toast = document.getElementById("toast");
@@ -137,11 +157,18 @@
   });
 
 
+const menuBtn = document.getElementById("menuToggle");
+const mobileMenu = document.getElementById("mobileMenu");
 
-// Wait 5 seconds, then hide loader and show website
-    window.addEventListener("load", () => {
-      setTimeout(() => {
-        document.querySelector(".loader-wrapper").classList.add("hide");
-        document.querySelector(".content").classList.add("show");
-      }, 4000); // 5 seconds
-    });
+menuBtn.addEventListener("click", () => {
+  menuBtn.classList.toggle("active");
+  mobileMenu.classList.toggle("active");
+});
+
+/* Auto close menu when link is clicked */
+document.querySelectorAll(".mobile-menu a").forEach(link => {
+  link.addEventListener("click", () => {
+    menuBtn.classList.remove("active");
+    mobileMenu.classList.remove("active");
+  });
+});
