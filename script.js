@@ -4,8 +4,7 @@
 
 // ─── DISCORD WEBHOOK ────────────────────────────────────────
 // Replace with your actual Discord webhook URL:
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1398705815912714251/n10B50rZ5nxMnhmvj6u-dZ1zPScFYJUzncnlSr_mFdpLLA2s9-G6SwBvwRxpLQSWU4RE';
-// ────────────────────────────────────────────────────────────
+const API_URL = '/api/contact';// ────────────────────────────────────────────────────────────
 
 // ===== NAVBAR =====
 const navbar    = document.getElementById('navbar');
@@ -184,11 +183,18 @@ form.addEventListener('submit', async e => {
   );
 
   try {
-    const res = await fetch(DISCORD_WEBHOOK_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload)
-    });
+   // AFTER ✅
+const res = await fetch(API_URL, {
+  method:  'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    name:        nameEl.value.trim(),
+    phone:       phoneEl.value.trim(),
+    email:       emailEl.value.trim(),
+    classChoice: classEl ? classEl.value.trim() : '',
+    message:     msgEl.value.trim()
+  })
+});
 
     if (res.ok || res.status === 204) {
       form.reset();
