@@ -1,44 +1,28 @@
 export default async function handler(req, res) {
-  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { name, phone, email, classChoice, message } = req.body;
 
-  const now = new Date().toLocaleString('en-IN', {
-    timeZone: 'Asia/Kolkata',
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  });
-
-  const payload = {
-    username: 'Dance Warriors Studio',
-    embeds: [{
-      title: '💃 New Enquiry Received!',
-      color: 0xC9A84C,
-      fields: [
-        { name: '👤 Name',          value: name        || '—', inline: true  },
-        { name: '📞 Phone',         value: phone       || '—', inline: true  },
-        { name: '📧 Email',         value: email       || '—', inline: false },
-        { name: '🎭 Interested In', value: classChoice || '—', inline: false },
-        { name: '💬 Message',       value: message     || '—', inline: false },
-      ],
-      footer: { text: 'Dance Warriors Studio • ' + now + ' IST' }
-    }]
-  };
-
   try {
-    const response = await fetch(process.env.WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const response = await fetch(process.env.FORMSPREE_URL, {
+      method:  'POST',
+      headers: {
+        'Accept':       'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name, phone, email, classChoice, message })
     });
 
-    if (response.ok || response.status === 204) {
+    if (response.ok) {
       return res.status(200).json({ success: true });
     } else {
-      return res.status(500).json({ error: 'Discord error' });
+      const data = await response.json();
+      const errorMsg = data.errors
+        ? data.errors.map(e => e.message).join(', ')
+        : 'Formspree error';
+      return res.status(500).json({ error: errorMsg });
     }
   } catch (err) {
     return res.status(500).json({ error: 'Network error' });

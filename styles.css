@@ -1606,10 +1606,9 @@
 
   .footer-copy a {
     text-decoration: none;
-    font-family: 'Playfair Display', serif;
-    color: #b1a99d;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    color: #C9A84C;
     font-weight: 500;
-    font-size: 14px;
   }
 
   .footer-copy a:hover {

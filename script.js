@@ -2,9 +2,7 @@
 //  DANCE WARRIORS STUDIO — script.js
 // ============================================================
 
-// ─── DISCORD WEBHOOK ────────────────────────────────────────
-// Replace with your actual Discord webhook URL:
-const API_URL = '/api/contact';// ────────────────────────────────────────────────────────────
+const API_URL = '/api/contact';
 
 // ===== NAVBAR =====
 const navbar    = document.getElementById('navbar');
@@ -21,7 +19,6 @@ function closeMenu() {
 
 window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 60);
-  // scroll does NOT close the menu
 });
 
 hamburger.addEventListener('click', () => {
@@ -36,12 +33,10 @@ hamburger.addEventListener('click', () => {
   }
 });
 
-// Close when a link is clicked
 navLinks.querySelectorAll('a').forEach(a =>
   a.addEventListener('click', closeMenu)
 );
 
-// Close when clicking the backdrop
 backdrop.addEventListener('click', closeMenu);
 
 // ===== SCROLL REVEAL =====
@@ -91,7 +86,7 @@ document.querySelectorAll('.enroll-btn').forEach(btn => {
   });
 });
 
-// ===== CONTACT FORM — validation + Discord webhook =====
+// ===== CONTACT FORM — validation + Formspree via Vercel API =====
 const form  = document.getElementById('contactForm');
 const modal = document.getElementById('successModal');
 
@@ -119,35 +114,6 @@ form.querySelectorAll('input, textarea').forEach(el => {
   });
 });
 
-// Build a rich Discord embed from form data
-function buildDiscordPayload(name, phone, email, classChoice, message) {
-  const now = new Date().toLocaleString('en-IN', {
-    timeZone: 'Asia/Kolkata',
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  });
-
-  return {
-    username: 'Dance Warriors Studio',
-    embeds: [
-      {
-        title: '💃 New Enquiry Received!',
-        color: 0xC9A84C,
-        fields: [
-          { name: '👤 Name',          value: name        || '—', inline: true  },
-          { name: '📞 Phone',         value: phone       || '—', inline: true  },
-          { name: '📧 Email',         value: email       || '—', inline: false },
-          { name: '🎭 Interested In', value: classChoice || '—', inline: false },
-          { name: '💬 Message',       value: message     || '—', inline: false },
-        ],
-        footer: {
-          text: 'Dance Warriors Studio • ' + now + ' IST'
-        }
-      }
-    ]
-  };
-}
-
 // Submit handler
 form.addEventListener('submit', async e => {
   e.preventDefault();
@@ -159,7 +125,7 @@ form.addEventListener('submit', async e => {
   const msgEl     = document.getElementById('message');
   const submitBtn = form.querySelector('.submit-btn');
 
-  // Run all validations; every() ensures all errors show at once
+  // Run all validations
   const isValid = [
     validate('name',    nameEl.value.trim().length >= 2),
     validate('email',   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)),
@@ -169,39 +135,31 @@ form.addEventListener('submit', async e => {
 
   if (!isValid) return;
 
-  // Disable button while sending to prevent double-submit
+  // Disable button while sending
   const originalHTML  = submitBtn.innerHTML;
   submitBtn.disabled  = true;
   submitBtn.innerHTML = '⏳ Sending…';
 
-  const payload = buildDiscordPayload(
-    nameEl.value.trim(),
-    phoneEl.value.trim(),
-    emailEl.value.trim(),
-    classEl  ? classEl.value.trim() : '',
-    msgEl.value.trim()
-  );
-
   try {
-   // AFTER ✅
-const res = await fetch(API_URL, {
-  method:  'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    name:        nameEl.value.trim(),
-    phone:       phoneEl.value.trim(),
-    email:       emailEl.value.trim(),
-    classChoice: classEl ? classEl.value.trim() : '',
-    message:     msgEl.value.trim()
-  })
-});
+    const res = await fetch(API_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:        nameEl.value.trim(),
+        phone:       phoneEl.value.trim(),
+        email:       emailEl.value.trim(),
+        classChoice: classEl ? classEl.value.trim() : '',
+        message:     msgEl.value.trim()
+      })
+    });
 
-    if (res.ok || res.status === 204) {
+    const data = await res.json();
+
+    if (res.ok) {
       form.reset();
       modal.classList.add('active');
     } else {
-      console.error('Discord webhook error:', res.status, await res.text());
-      alert('Something went wrong. Please try again or contact us directly.');
+      alert(data.error || 'Something went wrong. Please try again.');
     }
   } catch (err) {
     console.error('Network error:', err);
