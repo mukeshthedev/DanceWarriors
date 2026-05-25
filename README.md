@@ -70,18 +70,6 @@ dance-warriors-studio/
 
 ---
 
-## 🗓️ Class Schedule
-
-| Day | Timing | Session |
-|---|---|---|
-| Friday | 05:00 – 06:30 PM | Evening |
-| Saturday | 05:00 – 06:30 PM | Evening |
-| Sunday | Flexible | Personal Training |
-
-> Personal training also available for one-on-one sessions tailored to your skill level, goals, and schedule.
-
----
-
 ## 🔒 Environment Variables
 
 This project uses a Vercel serverless function to keep the Formspree key secure.
